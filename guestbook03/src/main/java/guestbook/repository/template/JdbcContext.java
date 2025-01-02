@@ -28,8 +28,8 @@ public class JdbcContext {
 			}
 		}, rowMapper);
 	}
-	
-	private <E> List<E> queryForListWithStatementStrategy(StatementStrategy statementStrategy, RowMapper<E> rowMapper) {
+
+	private <E> List<E> queryForListWithStatementStrategy(StatementStrategy statementStrategy, RowMapper<E> rowMapper) throws RuntimeException {
 		List<E> result = new ArrayList<>();
 		
 		try (
@@ -41,10 +41,10 @@ public class JdbcContext {
 					E e = rowMapper.mapRow(rs, rs.getRow());
 					result.add(e);
 				}
-		
 		} catch (SQLException e) {
-				System.out.println("error:" + e);
+				throw new RuntimeException();
 			} 
+		
 		return result;
 	}
 
@@ -63,7 +63,7 @@ public class JdbcContext {
 		});
 	}
 	
-	private int executeUpdateWithStatementStrategy(StatementStrategy statementStrategy) {		
+	private int executeUpdateWithStatementStrategy(StatementStrategy statementStrategy) throws RuntimeException {		
 		int count = 0;
 		
 		try (
@@ -72,11 +72,9 @@ public class JdbcContext {
 		) {
 			count = pstmt.executeUpdate();
 		} catch (SQLException e) {
-			System.out.println("error:" + e);
+			throw new RuntimeException();
 		} 
 		
 		return count;	
 	}
-
-	
 }
