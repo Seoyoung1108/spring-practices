@@ -9,11 +9,32 @@ import aop.service.ProductService;
 
 public class App {
 	public static void main(String[] args) {
+		// 나머지
+		test01();
+		
+		// after throwing
+		//test02();
+	}
+	
+	public static void test01() {
 		ApplicationContext ac = new ClassPathXmlApplicationContext("config/applicationContext.xml");	
 		ProductService ps = ac.getBean(ProductService.class);
 		Product p = ps.find("TV");
 		System.out.println(p);
 		
 		((AbstractApplicationContext)ac).close();
+	}
+	
+	public static void test02() {
+		try {
+			ApplicationContext ac = new ClassPathXmlApplicationContext("config/applicationContext.xml");	
+			ProductService ps = ac.getBean(ProductService.class);
+			Product p = ps.find("");
+			System.out.println(p);
+			
+			((AbstractApplicationContext)ac).close();
+		} catch(RuntimeException re) {
+			
+		}
 	}
 }
