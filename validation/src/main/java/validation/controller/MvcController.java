@@ -57,4 +57,20 @@ public class MvcController {
 		System.out.println(user);
 		return "redirect:/result";
 	}
+	
+	@GetMapping("/ex02")
+	public String ex02() {
+		return "form/ex02";
+	}
+	
+	@PostMapping("/ex02")
+	public String ex02(@ModelAttribute @Valid User user, BindingResult result, Model model) {
+		if(result.hasErrors()) {
+			Map<String,Object> map = result.getModel();
+			model.addAllAttributes(map); // key로 풀어서 보내줌.
+			
+			return "form/ex02";
+		}
+		return "redirect:/result";
+	}
 }
