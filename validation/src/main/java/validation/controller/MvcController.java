@@ -73,4 +73,20 @@ public class MvcController {
 		}
 		return "redirect:/result";
 	}
+	
+	@GetMapping("/ex03")
+	public String ex03(@ModelAttribute User user) { // null 방지
+		return "form/ex03";
+	}
+	
+	@PostMapping("/ex03")
+	public String ex03(@ModelAttribute @Valid User user, BindingResult result, Model model) {
+		if(result.hasErrors()) {
+			Map<String,Object> map = result.getModel();
+			model.addAllAttributes(map); // key로 풀어서 보내줌.
+			
+			return "form/ex03";
+		}
+		return "redirect:/result";
+	}
 }
