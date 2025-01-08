@@ -18,38 +18,17 @@ public class JdbcContext {
 		this.dataSource=dataSource;
 	}
 	
-	public <E> List<E> queryForList(String sql, RowMapper<E> rowMapper) {
+	public <E> List<E> query(String sql, RowMapper<E> rowMapper) {
 		return queryForListWithStatementStrategy(new StatementStrategy() {
 			@Override
 			public PreparedStatement makeStatement(Connection connection) throws SQLException {
-				PreparedStatement pstmt = connection.prepareStatement(sql);
-				
-				return pstmt;
+				return connection.prepareStatement(sql);
 			}
 		}, rowMapper);
 	}
 
-	private <E> List<E> queryForListWithStatementStrategy(StatementStrategy statementStrategy, RowMapper<E> rowMapper) throws RuntimeException {
-		List<E> result = new ArrayList<>();
-		
-		try (
-				Connection conn = dataSource.getConnection();
-				PreparedStatement pstmt = statementStrategy.makeStatement(conn);
-				ResultSet rs = pstmt.executeQuery();
-			) {
-				while(rs.next()) {
-					E e = rowMapper.mapRow(rs, rs.getRow());
-					result.add(e);
-				}
-		} catch (SQLException e) {
-				throw new RuntimeException();
-			} 
-		
-		return result;
-	}
-
-	public int executeUpdate(String sql, Object[] parameters) {
-		return executeUpdateWithStatementStrategy(new StatementStrategy() {
+	public int update(String sql, Object... parameters) {
+		return updateWithStatementStrategy(new StatementStrategy() {
 			@Override
 			public PreparedStatement makeStatement(Connection connection) throws SQLException {
 				PreparedStatement pstmt = connection.prepareStatement(sql);
@@ -63,7 +42,26 @@ public class JdbcContext {
 		});
 	}
 	
-	private int executeUpdateWithStatementStrategy(StatementStrategy statementStrategy) throws RuntimeException {		
+	private <E> List<E> queryForListWithStatementStrategy(StatementStrategy statementStrategy, RowMapper<E> rowMapper) throws RuntimeException {
+		List<E> result = new ArrayList<>();
+		
+		try (
+			Connection conn = dataSource.getConnection();
+			PreparedStatement pstmt = statementStrategy.makeStatement(conn);
+			ResultSet rs = pstmt.executeQuery();
+		) {
+			while(rs.next()) {
+				E e = rowMapper.mapRow(rs, rs.getRow());
+				result.add(e);
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		
+		return result;
+	}
+	
+	private int updateWithStatementStrategy(StatementStrategy statementStrategy) throws RuntimeException {		
 		int count = 0;
 		
 		try (
@@ -72,7 +70,7 @@ public class JdbcContext {
 		) {
 			count = pstmt.executeUpdate();
 		} catch (SQLException e) {
-			throw new RuntimeException();
+			throw new RuntimeException(e);
 		} 
 		
 		return count;	
