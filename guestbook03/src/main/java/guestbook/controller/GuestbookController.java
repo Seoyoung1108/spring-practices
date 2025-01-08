@@ -12,16 +12,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import guestbook.repository.GuestbookRepository;
+import guestbook.service.GuestbookService;
 import guestbook.vo.GuestbookVo;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class GuestbookController {
-	private GuestbookRepository guestbookRepository;
+	private GuestbookService guestbookService;
 	
-	public GuestbookController(GuestbookRepository guestbookRepository) { // null이어도 에러 안터지게
-		this.guestbookRepository = guestbookRepository;
+	public GuestbookController(GuestbookService guestbookService) { // null이어도 에러 안터지게
+		this.guestbookService = guestbookService;
 	}
 	
 	@RequestMapping("/")
@@ -45,14 +46,14 @@ public class GuestbookController {
 		System.out.println(ac1==ac2);
 		*/
 		
-		List<GuestbookVo> list = guestbookRepository.findAll();
+		List<GuestbookVo> list = guestbookService.getContentsList();
 		model.addAttribute("list", list);
 		return "index";
 	}
 	
 	@RequestMapping("/add")
 	public String add(GuestbookVo vo) {
-		guestbookRepository.insert(vo);
+		guestbookService.addContents(vo);
 		return "redirect:/";
 	}
 	
@@ -64,7 +65,7 @@ public class GuestbookController {
 	
 	@RequestMapping(value="/delete/{no}", method=RequestMethod.POST)
 	public String delete(@PathVariable("no") Long no, @RequestParam(value="password",required=true,defaultValue="") String password) {
-		guestbookRepository.deleteByIdAndPassword(no, password);
+		guestbookService.deleteContents(no, password);
 		return "redirect:/";
 	}
 }
