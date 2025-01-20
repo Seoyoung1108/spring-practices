@@ -18,6 +18,12 @@ public class Ex01 {
         // thymeleaf view
         return "ex01/01";
     }
+    
+    @GetMapping("/02")
+    public String _02(Model model) {
+    	// JSTL View
+        return "views/ex01/02";  // 위와 경로 차이점 주기
+    }
 
     @GetMapping("/03")
     public String _03(Model model) {
